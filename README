@@ -1,0 +1,29 @@
+## Sådan køres projektet
+
+1. Åbn projektmappen i terminalen.
+
+2. Installer dependencies:
+
+npm install
+
+3. Start projektet med Expo:
+
+npx expo start
+
+4. Scan QR-koden med Expo Go på mobilen eller åbn projektet i webversion.
+
+## Demovideo
+
+Link til demovideo:
+
+[INDSÆT LINK HER]
+
+## Teknologi
+
+* React Native
+* Expo
+* JavaScript
+
+## Udarbejdet af
+
+Syed Ali Hamza Naqvi
