@@ -23,7 +23,7 @@ export default function PeopleLikeMeScreen({ navigation }) {
     setStatus('matching');
 
     try {
-      setMatches(await findMatches());
+      setMatches(await findMatches(savedProfile));
       matchedVersion.current = savedProfile.updatedAt;
       setStatus('ready');
     } catch (error) {
@@ -67,8 +67,9 @@ export default function PeopleLikeMeScreen({ navigation }) {
 
   const acceptConsent = async () => {
     try {
-      await giveAiConsent();
-      await runMatching(profile);
+      const consentedProfile = await giveAiConsent(profile);
+      setProfile(consentedProfile);
+      await runMatching(consentedProfile);
     } catch (error) {
       setErrorMessage('Your consent could not be saved. Please try again.');
       setStatus('error');
@@ -127,9 +128,10 @@ export default function PeopleLikeMeScreen({ navigation }) {
       <View style={[styles.screen, styles.centeredState]}>
         <Text style={styles.stateTitle}>Before we use AI</Text>
         <Text style={styles.formIntro}>
-          To find people like you, Coreliance sends your profile answers (not your
-          email) and our fictional career cases to OpenAI through our secure server.
-          OpenAI uses them to suggest matches and write explanations.
+          To find people like you, Coreliance sends your profile answers to OpenAI
+          through a small local server, together with our fictional career cases.
+          OpenAI uses them to suggest matches and write explanations. Your profile
+          is not stored anywhere else than on this device.
         </Text>
         <Text style={styles.noteText}>
           This is an academic demonstration. AI can make mistakes, and the results say

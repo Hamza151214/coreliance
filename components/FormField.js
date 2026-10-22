@@ -64,8 +64,6 @@ export default function FormField({ field, value, onChange, error, onFocus }) {
           ]}
           placeholder={field.placeholder}
           keyboardType={field.keyboardType}
-          autoCapitalize={field.autoCapitalize}
-          secureTextEntry={field.secure}
           maxLength={field.maxLength || (field.multiline ? 1000 : 150)}
           multiline={field.multiline}
           value={value}

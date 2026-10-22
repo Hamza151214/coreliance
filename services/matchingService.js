@@ -1,40 +1,67 @@
-import { httpsCallable } from 'firebase/functions';
+import { Platform } from 'react-native';
 
-import { functions } from '../database/firebase';
 import { getCareerCases } from './careerCaseService';
 
-// People Like Me-matching med OpenAI.
-// Appen kalder Cloud Function'en "matchProfile" (functions/index.js). Den:
-// 1. tjekker at brugeren er logget ind og har givet samtykke,
-// 2. henter brugerens profil og de fiktive cases fra databasen,
-// 3. spørger OpenAI og returnerer matches med forklaringer.
-// OpenAI-nøglen ligger kun i backend.
-const matchProfile = httpsCallable(functions, 'matchProfile', { timeout: 120000 });
+// People Like Me-matching med OpenAI gennem den lokale server (server/index.js).
+// Appen kender ikke OpenAI-nøglen; den ligger kun i server/.env.
+//
+// Adressen på serveren:
+// - Web og iOS-simulator: localhost
+// - Android-emulator: 10.0.2.2 (emulatorens adresse til computeren)
+// - Fysisk telefon: start appen med EXPO_PUBLIC_API_URL=http://<computerens-IP>:3001 (se README)
+const API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Platform.OS === 'android' ? 'http://10.0.2.2:3001' : 'http://localhost:3001');
 
-// Venlige fejlbeskeder ud fra Firebase-fejlkoder.
+const TIMEOUT_MS = 60000;
+
+// Forståelige fejlbeskeder ud fra serverens fejlkoder.
 const ERROR_MESSAGES = {
-  'functions/resource-exhausted':
-    'You have reached the matching limit. Please wait a moment or try again tomorrow.',
-  'functions/failed-precondition': 'Please complete your profile and accept AI processing first.',
-  'functions/unauthenticated': 'Please log in again.',
-  'functions/not-found': 'The AI matching service is not deployed yet.',
+  missing_api_key: 'The AI server has no OpenAI API key. Add it to server/.env and restart the server.',
+  openai_error: 'OpenAI could not be reached or returned an error. Please try again.',
+  invalid_ai_response: 'The AI returned an invalid answer. Please try again.',
+  invalid_profile: 'Your profile is incomplete. Please check your desired roles and goals.',
 };
 
-// Output: en liste af matches i samme format som før, så PeopleLikeMeScreen
-// og CareerCaseScreen kan bruges uændret:
+// Input: den gemte jobsøgerprofil.
+// Output: en liste af matches i samme format, som PeopleLikeMeScreen og CareerCaseScreen bruger:
 // { careerCaseId, careerCase, relevance, summary, similarities, differences, lessons }
-export async function findMatches() {
-  try {
-    const [response, careerCases] = await Promise.all([matchProfile(), getCareerCases()]);
+export async function findMatches(profile) {
+  // AbortController stopper kaldet, hvis serveren ikke svarer inden for tidsgrænsen.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  let response;
 
-    // Jeg kobler AI'ens case-id'er sammen med de rigtige case-objekter.
-    return response.data.matches
-      .map((match) => ({
-        ...match,
-        careerCase: careerCases.find((careerCase) => careerCase.id === match.careerCaseId),
-      }))
-      .filter((match) => match.careerCase);
+  try {
+    response = await fetch(`${API_URL}/match`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile }),
+      signal: controller.signal,
+    });
   } catch (error) {
-    throw new Error(ERROR_MESSAGES[error.code] || 'AI matching failed. Please try again later.');
+    throw new Error(
+      error.name === 'AbortError'
+        ? 'The AI server took too long to answer. Please try again.'
+        : 'Could not reach the local AI server. Make sure it is running with "npm run dev".'
+    );
+  } finally {
+    clearTimeout(timeout);
   }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(ERROR_MESSAGES[data.error] || 'AI matching failed. Please try again.');
+  }
+
+  // Jeg kobler AI'ens case-id'er sammen med de rigtige case-objekter.
+  const careerCases = await getCareerCases();
+
+  return data.matches
+    .map((match) => ({
+      ...match,
+      careerCase: careerCases.find((careerCase) => careerCase.id === match.careerCaseId),
+    }))
+    .filter((match) => match.careerCase);
 }

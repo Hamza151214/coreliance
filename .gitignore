@@ -38,9 +38,6 @@ yarn-error.*
 /ios
 /android
 
-# Firebase
-.firebase/
-firebase-debug.log*
-database-debug.log*
-functions/.secret.local
-functions/.env.local
+# hemmeligheder (OpenAI-nøglen ligger i server/.env)
+.env
+server/.env

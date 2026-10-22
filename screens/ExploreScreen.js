@@ -6,8 +6,8 @@ import { getCareerCases } from '../services/careerCaseService';
 import { styles } from '../styles/styles';
 
 export default function ExploreScreen({ navigation }) {
-  // Jeg henter career cases fra Firebase gennem careerCaseService,
-  // så skærmen ikke selv kender til databasen.
+  // Jeg henter career cases gennem careerCaseService,
+  // så skærmen ikke selv ved, hvor data kommer fra.
   const [careerCases, setCareerCases] = useState([]);
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -90,7 +90,7 @@ export default function ExploreScreen({ navigation }) {
 
             <Text style={styles.noteText}>
               {loadFailed
-                ? 'Career cases could not be loaded. Please check your connection.'
+                ? 'Career cases could not be loaded.'
                 : 'All career cases are fictional demonstration profiles made for this academic prototype.'}
             </Text>
           </>

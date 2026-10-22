@@ -16,7 +16,7 @@ import { styles } from '../styles/styles';
 
 // Her opretter eller redigerer jobsøgeren sin profil.
 // Felterne kommer fra data/jobSeekerProfile.js, og gem/hent sker
-// gennem profileService, så skærmen ikke selv kender til Firebase.
+// gennem profileService, så skærmen ikke selv kender til AsyncStorage.
 export default function JobSeekerProfileScreen({ navigation }) {
   const scrollViewRef = useRef(null);
 
@@ -137,8 +137,8 @@ export default function JobSeekerProfileScreen({ navigation }) {
         </Text>
 
         <Text style={styles.noteText}>
-          Your profile is saved in your Coreliance account, and only you can see it.
-          It is only sent to the AI if you agree on the People Like Me screen.
+          Your profile is only saved on this device. It is only sent to the AI
+          if you agree on the People Like Me screen.
           Fields marked * are required.
         </Text>
 

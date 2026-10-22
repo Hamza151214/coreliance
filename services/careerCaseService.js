@@ -1,10 +1,8 @@
-import { ref, get } from 'firebase/database';
-
-import { db } from '../database/firebase';
+import CAREER_CASES from '../data/careerCases.json';
 
 // Denne fil er det eneste sted i appen, der ved hvor career cases kommer fra.
-// Casene ligger i Firebase Realtime Database under careerCases/<id>.
-// Lige nu er alle cases fiktive demo-profiler (se seed/careerCases.json).
+// Casene er 14 fiktive demo-profiler i data/careerCases.json.
+// Den lokale AI-server læser den samme fil, så der kun findes én datakilde.
 
 // Jeg omdanner alle cases til den samme model, så skærmene kan stole på,
 // at lister altid er arrays og at manglende felter ikke får appen til at crashe.
@@ -36,9 +34,8 @@ function normalizeCareerCase(id, raw) {
   };
 }
 
+// Funktionen er async, så skærmene ikke skal ændres, hvis casene
+// senere skal hentes fra en rigtig datakilde i stedet for en lokal fil.
 export async function getCareerCases() {
-  const snapshot = await get(ref(db, 'careerCases'));
-  const casesById = snapshot.val() || {};
-
-  return Object.entries(casesById).map(([id, careerCase]) => normalizeCareerCase(id, careerCase));
+  return Object.entries(CAREER_CASES).map(([id, careerCase]) => normalizeCareerCase(id, careerCase));
 }

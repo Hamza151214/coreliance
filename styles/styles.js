@@ -432,15 +432,6 @@ export const styles = StyleSheet.create({
     marginTop: 16,
   },
 
-  // LOGIN (AuthScreen)
-  authContainer: {
-    padding: 24,
-    paddingTop: 72,
-  },
-  authNote: {
-    marginTop: 24,
-    textAlign: 'center',
-  },
   sectionDescription: {
     marginTop: 4,
     marginBottom: 0,

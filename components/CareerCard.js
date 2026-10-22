@@ -13,7 +13,11 @@ function joinParts(parts) {
 // - children: valgfrit ekstra indhold, fx forklaringen på et match i People Like Me
 // Vi bruger Pressable, så hele kortet fungerer som en knap
 export default function CareerCard({ careerCase, onPress, children }) {
-  const danish = careerCase.danishLevel ? `Danish ${careerCase.danishLevel}` : '';
+  // "No Danish" skal ikke blive til "Danish No Danish".
+  const danish =
+    careerCase.danishLevel && careerCase.danishLevel !== 'No Danish'
+      ? `Danish ${careerCase.danishLevel}`
+      : careerCase.danishLevel;
 
   return (
     <Pressable style={styles.card} onPress={onPress}>

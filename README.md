@@ -3,78 +3,97 @@
 Coreliance hjælper internationale studerende og nyuddannede med at forstå,
 hvordan andre internationale er kommet ind på det danske arbejdsmarked.
 
-## Sådan køres projektet
+Dette er en **lokal akademisk prototype** (CBS INNT). Alle career cases er **fiktive demo-profiler**.
 
-1. Åbn projektmappen i terminalen.
+## Installation
 
-2. Installer dependencies:
+Kræver Node.js 22.9 eller nyere.
 
+```bash
 npm install
+```
 
-3. Start projektet med Expo:
+## OpenAI-nøgle (.env)
 
-npx expo start
+AI-matchingen kører gennem en lille lokal server, som har OpenAI-nøglen. Appen kender aldrig nøglen.
 
-4. Scan QR-koden med Expo Go på mobilen eller åbn projektet i webversion.
+1. Kopiér `server/.env.example` til `server/.env`.
+2. Indsæt din egen nøgle: `OPENAI_API_KEY=sk-...`
+
+`server/.env` er udelukket fra Git. Uden nøgle virker alt undtagen People Like Me, som viser en tydelig fejl.
+
+## Start appen
+
+```bash
+npm run dev
+```
+
+Kommandoen starter både den lokale AI-server (port 3001) og Expo. Tryk `w` for web, `i` for
+iOS-simulator, eller scan QR-koden med Expo Go.
+
+**Fysisk telefon:** telefonen kan ikke nå `localhost` på computeren. Start i stedet med computerens
+IP-adresse (vises i Expo som `exp://192.168.x.x:8081`):
+
+```bash
+HOST=0.0.0.0 EXPO_PUBLIC_API_URL=http://192.168.x.x:3001 npm run dev
+```
+
+Telefon og computer skal være på samme Wi-Fi. Serveren er kun tilgængelig på lokalnetværket.
+
+Server-tests med en falsk OpenAI (ingen nøgle nødvendig): `npm test`.
 
 ## Funktioner
 
-* **Login** – opret konto, log ind og log ud med Firebase Authentication.
-* **Explore** – fiktive career cases hentet fra Firebase Realtime Database, med filtre og detaljeside.
-* **My Profile** – kort jobsøgerprofil (12 spørgsmål, primært valgknapper og to fritekstfelter),
-  gemt i Realtime Database under brugerens UID og kan redigeres senere.
-* **People Like Me** – efter eksplicit samtykke sendes profilen og de fiktive cases til OpenAI via en
-  sikker Firebase Cloud Function, som returnerer matches med forklaringer.
-* **About** – kort forklaring af idéen bag Coreliance samt log ud.
-* **Contribute** – demo-formular til personer, der allerede har fået job.
-  Indholdet sendes ikke nogen steder.
+* **Explore**: de 14 fiktive career cases med filtre og detaljeside.
+* **My Profile**: kort jobsøgerprofil (12 spørgsmål i tre sektioner, primært valgknapper og to
+  fritekstfelter) med validering. Profilen kan redigeres senere.
+* **People Like Me**: efter samtykke sendes profilen til den lokale server, som spørger OpenAI og
+  returnerer de mest relevante cases med ligheder, forskelle og læringspointer.
+* **Career Case**: detaljesiden, som bruges fra både Explore og People Like Me.
+* **About**: kort forklaring af idéen.
+* **Contribute**: lokal demo-formular for ansatte. Intet gemmes eller sendes.
 
-Flow: Login → Explore → People Like Me → My Profile → samtykke → AI-matches → Career Case.
+## Data og AI
 
-## Vigtigt om data
-
-* Dette er en **akademisk demonstration** (CBS INNT).
-* Alle career cases er **fiktive demo-profiler** (`seed/careerCases.json`).
-* OpenAI-nøglen ligger kun som secret i Firebase og aldrig i appen.
-
-## Firebase-opsætning (én gang)
-
-Se `INTEGRATION_HANDOFF.md`, afsnit 5. Kort fortalt: opret projektet, slå Email/Password-login til,
-opret Realtime Database (Belgium), og kør derefter `npm run deploy:rules`, `npm run seed:cases` og
-`npm run deploy:functions`. Det sidste kræver Blaze-planen og en OpenAI-nøgle.
+* **AsyncStorage** gemmer kun jobsøgerens profil og tidspunktet for AI-samtykke på enheden
+  (nøglen `coreliance:jobSeekerProfile`).
+* **Career cases** ligger i `data/careerCases.json`. Både appen og serveren læser den samme fil.
+* **OpenAI-matching**: serveren sender kun de relevante profilfelter og de fiktive cases til OpenAI,
+  beder om struktureret JSON og kontrollerer, at alle case-ID'er findes. Nationalitet og andre
+  beskyttede karakteristika bruges ikke. Hvis OpenAI fejler, vises fejlen. Der er ingen skjult
+  "nød-matching".
 
 ## Projektstruktur
 
 ```
-App.js                        Viser login eller appen ud fra Firebase Auth
-database/firebase.js          Firebase-konfiguration (auth, database, functions)
+App.js                        Root med NavigationContainer
 navigation/AppNavigator.js    Bottom tabs + Explore-stak
-screens/                      Auth, Explore, CareerCase, PeopleLikeMe, JobSeekerProfile, About, Contribute
-components/                   CareerCard, FormField (genbruges af alle formularer)
+screens/                      Explore, CareerCase, PeopleLikeMe, JobSeekerProfile, About, Contribute
+components/                   CareerCard, FormField
+data/careerCases.json         14 fiktive career cases
 data/jobSeekerProfile.js      Felter og validering for jobsøgerprofilen
-services/careerCaseService.js Henter career cases fra Firebase
-services/profileService.js    Gemmer/henter profil og AI-samtykke i Firebase
-services/matchingService.js   Kalder Cloud Function'en for AI-matching
-functions/index.js            Cloud Function: login-tjek, samtykke, rate limit, OpenAI-kald
-database.rules.json           Database-regler (kun egen profil)
-seed/careerCases.json         14 fiktive career cases til databasen
+services/careerCaseService.js Henter career cases
+services/profileService.js    Gemmer/henter profil og samtykke med AsyncStorage
+services/matchingService.js   Kalder den lokale AI-server
+server/index.js               Lokal Node.js-server (POST /match)
+server/matching.js            Prompt, OpenAI-kald og validering
+server/matching.test.js       Tests med falsk OpenAI
+scripts/dev.js                Starter server og Expo med én kommando
 styles/styles.js              Alle styles og farver
 ```
 
 ## Demovideo
 
-Link til demovideo (første iteration):
+Link til demovideo (første iteration, **ny video skal indsættes**):
 
 https://www.loom.com/share/7153c40e06de4f07829d83e080fae41b
 
 ## Teknologi
 
-* React Native
-* Expo
-* JavaScript
+* React Native, Expo og JavaScript
 * React Navigation
-* Firebase (Authentication, Realtime Database, Cloud Functions)
-* OpenAI API (via Cloud Functions)
+* AsyncStorage
+* Node.js og OpenAI JavaScript SDK
 
 ## Udarbejdet af
 

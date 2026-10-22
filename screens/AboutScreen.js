@@ -1,17 +1,9 @@
-import { ScrollView, View, Text, Pressable } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { signOut } from 'firebase/auth';
-
-import { auth } from '../database/firebase';
 
 import { styles, colors } from '../styles/styles';
 
 export default function AboutScreen() {
-  // Når brugeren logger ud, opdager App.js det og viser login-skærmen igen.
-  const handleLogout = () => {
-    signOut(auth);
-  };
-
   return (
     <ScrollView style={styles.screen}>
       <View style={styles.aboutContainer}>
@@ -108,16 +100,6 @@ export default function AboutScreen() {
               international student navigate the job market.
             </Text>
           </View>
-        </View>
-
-        {/* Konto og log ud */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your account</Text>
-          <Text style={styles.formIntro}>Logged in as {auth.currentUser?.email}</Text>
-
-          <Pressable style={styles.secondaryButton} onPress={handleLogout}>
-            <Text style={styles.secondaryButtonText}>Log out</Text>
-          </Pressable>
         </View>
 
         <Text style={styles.noteText}>
