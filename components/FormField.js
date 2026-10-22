@@ -9,7 +9,21 @@ import { styles } from '../styles/styles';
 //
 // "field" er et objekt fra en feltliste, fx { label, placeholder, required, multiline }.
 // Hvis feltet har "options", vises valgknapper i stedet for et tekstfelt.
+// Med "multiSelect" kan flere knapper vælges, og værdien er et array.
 export default function FormField({ field, value, onChange, error, onFocus }) {
+  // Jeg finder ud af om en knap er valgt, og hvad den nye værdi bliver ved et tryk.
+  const isSelected = (option) => (field.multiSelect ? (value || []).includes(option) : value === option);
+
+  const toggleOption = (option) => {
+    if (field.multiSelect) {
+      const selected = value || [];
+      onChange(isSelected(option) ? selected.filter((item) => item !== option) : [...selected, option]);
+    } else {
+      // Trykker man på det valgte svar igen, fjernes valget.
+      onChange(isSelected(option) ? '' : option);
+    }
+  };
+
   return (
     <View>
       <Text style={styles.inputLabel}>
@@ -22,7 +36,7 @@ export default function FormField({ field, value, onChange, error, onFocus }) {
       {field.options ? (
         <View style={styles.choiceRow}>
           {field.options.map((option) => {
-            const isActive = value === option;
+            const isActive = isSelected(option);
 
             return (
               <Pressable
@@ -32,8 +46,7 @@ export default function FormField({ field, value, onChange, error, onFocus }) {
                   styles.choiceButton,
                   isActive && styles.filterButtonActive,
                 ]}
-                // Trykker man på det valgte svar igen, fjernes valget.
-                onPress={() => onChange(isActive ? '' : option)}
+                onPress={() => toggleOption(option)}
               >
                 <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
                   {option}
@@ -51,6 +64,8 @@ export default function FormField({ field, value, onChange, error, onFocus }) {
           ]}
           placeholder={field.placeholder}
           keyboardType={field.keyboardType}
+          autoCapitalize={field.autoCapitalize}
+          secureTextEntry={field.secure}
           maxLength={field.maxLength || (field.multiline ? 1000 : 150)}
           multiline={field.multiline}
           value={value}

@@ -420,10 +420,26 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  demoNote: {
-    fontSize: 12,
+  // Mærkat der viser, at en career case er fiktiv
+  fictionalTag: {
+    fontSize: 11,
+    fontWeight: '600',
     color: colors.textMuted,
+    marginTop: 8,
+  },
+  centeredText: {
+    textAlign: 'center',
     marginTop: 16,
+  },
+
+  // LOGIN (AuthScreen)
+  authContainer: {
+    padding: 24,
+    paddingTop: 72,
+  },
+  authNote: {
+    marginTop: 24,
+    textAlign: 'center',
   },
   sectionDescription: {
     marginTop: 4,

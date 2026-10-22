@@ -2,17 +2,30 @@
 // JobSeekerProfileScreen bygger formularen ud fra denne liste,
 // så et nyt spørgsmål kun skal tilføjes her.
 //
+// Formularen er bevidst kort: mest valgknapper og korte felter,
+// og kun to længere fritekstfelter, som giver AI'en personlig kontekst.
+//
 // Felttyper:
-// - options: brugeren vælger én værdi blandt knapper
+// - options: brugeren vælger én værdi
+// - options + multiSelect: brugeren kan vælge flere værdier (gemmes som array)
 // - multiline: længere fritekst
-// - list: kommasepareret tekst, fx "Excel, SQL, Python"
+// - ellers: kort tekstfelt
 
-const DANISH_LEVELS = ['No Danish', 'A1', 'A2', 'B1', 'B2', 'C1', 'Native'];
-const ENGLISH_LEVELS = ['Basic', 'Intermediate', 'Fluent', 'Native'];
+export const INDUSTRIES = [
+  'Finance',
+  'Data & Analytics',
+  'Consulting',
+  'Marketing & Communication',
+  'IT & Software',
+  'Sales & Business Development',
+  'Supply Chain & Operations',
+  'Design & UX',
+  'Public Sector & NGOs',
+];
 
 export const PROFILE_SECTIONS = [
   {
-    title: 'Education & background',
+    title: 'About you',
     fields: [
       {
         key: 'status',
@@ -20,7 +33,7 @@ export const PROFILE_SECTIONS = [
         required: true,
         options: ['Student', 'Recent Graduate', 'Other Job Seeker'],
       },
-      { key: 'university', label: 'University or institution', required: true, placeholder: 'e.g. CBS' },
+      { key: 'university', label: 'University', required: true, placeholder: 'e.g. CBS' },
       {
         key: 'degree',
         label: 'Degree and field of study',
@@ -28,126 +41,78 @@ export const PROFILE_SECTIONS = [
         placeholder: 'e.g. MSc Business Administration and Data Science',
       },
       {
-        key: 'graduationYear',
-        label: 'Graduation year (or expected)',
+        key: 'danishLevel',
+        label: 'Danish level',
         required: true,
-        placeholder: 'e.g. 2026',
-        keyboardType: 'numeric',
-        maxLength: 4,
+        options: ['No Danish', 'A1', 'A2', 'B1', 'B2', 'C1', 'Native'],
       },
-      {
-        key: 'countryOfOrigin',
-        label: 'Country of origin',
-        placeholder: 'e.g. Brazil',
-        hint: 'Optional. This is never used for matching.',
-      },
-      { key: 'danishLevel', label: 'Danish level', required: true, options: DANISH_LEVELS },
-      { key: 'englishLevel', label: 'English level', options: ENGLISH_LEVELS },
     ],
   },
   {
-    title: 'Professional background',
+    title: 'Your experience',
     fields: [
       {
-        key: 'workExperience',
-        label: 'Previous work experience',
-        multiline: true,
-        placeholder: 'Roles, internships or projects you have worked on',
-      },
-      {
-        key: 'studentJobs',
-        label: 'Student job experience',
-        multiline: true,
-        placeholder: 'e.g. Student assistant in finance at a Danish SME',
+        key: 'experienceLevel',
+        label: 'Relevant work experience',
+        required: true,
+        options: ['None yet', 'Student job or internship', '1–2 years', '3+ years'],
       },
       {
         key: 'skills',
-        label: 'Relevant skills',
+        label: 'Key skills',
         required: true,
-        list: true,
-        placeholder: 'e.g. Excel, SQL, Power BI',
-        hint: 'Separate skills with commas.',
+        placeholder: 'e.g. Excel, SQL, project management',
       },
       {
-        key: 'previousIndustries',
-        label: 'Industries you have worked in',
-        list: true,
-        placeholder: 'e.g. Banking, Retail',
-      },
-      {
-        key: 'employmentSituation',
-        label: 'Current employment situation',
-        options: ['Not employed', 'Student job', 'Internship', 'Part-time job', 'Full-time job'],
-      },
-      {
-        key: 'professionalBackground',
-        label: 'Tell us about your professional background.',
+        key: 'background',
+        label: 'Tell us about your background, experience and skills.',
+        required: true,
         multiline: true,
-      },
-      {
-        key: 'standOut',
-        label: 'What skills or experiences make you stand out?',
-        multiline: true,
+        placeholder: 'A few sentences are enough.',
       },
     ],
   },
   {
-    title: 'Career interests',
+    title: 'What you are looking for',
     fields: [
       {
         key: 'desiredRoles',
-        label: 'Desired job roles',
+        label: 'Desired job titles',
         required: true,
-        list: true,
         placeholder: 'e.g. Data Analyst, Business Analyst',
-        hint: 'Separate roles with commas.',
       },
       {
-        key: 'industriesOfInterest',
+        key: 'industries',
         label: 'Industries of interest',
-        list: true,
-        placeholder: 'e.g. Finance, Consulting, Tech',
+        required: true,
+        multiSelect: true,
+        options: INDUSTRIES,
+        hint: 'Choose one or more.',
       },
-      { key: 'preferredLocation', label: 'Preferred location', placeholder: 'e.g. Copenhagen' },
       {
-        key: 'employmentType',
-        label: 'Employment type',
-        options: ['Full-time', 'Part-time', 'Student job', 'Internship', 'Graduate programme'],
+        key: 'preferredLocation',
+        label: 'Preferred location',
+        options: ['Copenhagen', 'Aarhus', 'Odense', 'Aalborg', 'Anywhere in Denmark'],
       },
       {
         key: 'lookingFor',
         label: 'What kind of job are you looking for, and why?',
         required: true,
         multiline: true,
+        placeholder: 'A few sentences are enough.',
       },
-      { key: 'careerDirection', label: 'Describe your ideal career direction.', multiline: true },
-      {
-        key: 'workInterests',
-        label: 'What interests you most about the work you want to do?',
-        multiline: true,
-      },
-    ],
-  },
-  {
-    title: 'Your story',
-    description:
-      'These answers help us find people with a similar journey — not just the same job title.',
-    fields: [
       {
         key: 'biggestChallenge',
-        label: 'What has been your biggest challenge in finding a job in Denmark?',
+        label: 'Biggest challenge in your job search so far',
         required: true,
-        multiline: true,
-      },
-      {
-        key: 'beyondApplication',
-        label: 'Tell us something about yourself that a traditional job application might not capture.',
-        multiline: true,
-      },
-      {
-        key: 'wantToLearn',
-        label: 'What would you like to learn from someone who has successfully found a job here?',
-        multiline: true,
+        options: [
+          'Danish language requirements',
+          'No professional network',
+          'Little relevant experience',
+          'Getting invited to interviews',
+          'Knowing which jobs fit me',
+          'Understanding Danish work culture',
+        ],
       },
     ],
   },
@@ -155,9 +120,12 @@ export const PROFILE_SECTIONS = [
 
 const PROFILE_FIELDS = PROFILE_SECTIONS.flatMap((section) => section.fields);
 
-// En tom profil med alle felter som tomme tekster.
-// Den bruges som udgangspunkt, når formularen åbnes første gang.
-export const EMPTY_PROFILE = Object.fromEntries(PROFILE_FIELDS.map((field) => [field.key, '']));
+// En tom profil: tom tekst for almindelige felter og et tomt array for multiselect.
+export const EMPTY_PROFILE = Object.fromEntries(
+  PROFILE_FIELDS.map((field) => [field.key, field.multiSelect ? [] : ''])
+);
+
+const MIN_FREE_TEXT_LENGTH = 30;
 
 // Jeg returnerer et objekt med en fejltekst for hvert felt, der ikke er gyldigt.
 // Et tomt objekt betyder, at profilen kan gemmes.
@@ -165,33 +133,15 @@ export function validateProfile(profile) {
   const errors = {};
 
   PROFILE_FIELDS.forEach((field) => {
-    if (field.required && (profile[field.key] || '').trim() === '') {
-      errors[field.key] = 'This field is required.';
+    const value = profile[field.key];
+    const isEmpty = field.multiSelect ? !value || value.length === 0 : (value || '').trim() === '';
+
+    if (field.required && isEmpty) {
+      errors[field.key] = field.multiSelect ? 'Please choose at least one.' : 'This field is required.';
+    } else if (field.multiline && (value || '').trim().length < MIN_FREE_TEXT_LENGTH) {
+      errors[field.key] = `Please write at least a couple of sentences (${MIN_FREE_TEXT_LENGTH}+ characters).`;
     }
   });
 
-  // Årstallet skal være fire cifre og realistisk (op til 30 år tilbage og 6 år frem).
-  const year = Number(profile.graduationYear);
-  const currentYear = new Date().getFullYear();
-  const isValidYear =
-    /^\d{4}$/.test(profile.graduationYear) && year >= currentYear - 30 && year <= currentYear + 6;
-
-  if (!errors.graduationYear && !isValidYear) {
-    errors.graduationYear = 'Please enter a valid year, e.g. 2026.';
-  }
-
-  if (!errors.lookingFor && (profile.lookingFor || '').trim().length < 20) {
-    errors.lookingFor = 'Please write at least a sentence (20+ characters).';
-  }
-
   return errors;
-}
-
-// Lister skrives som kommasepareret tekst i formularen.
-// Her laver jeg dem om til et array, fx "Excel, SQL" -> ['Excel', 'SQL'].
-export function toList(text) {
-  return (text || '')
-    .split(',')
-    .map((item) => item.trim())
-    .filter((item) => item !== '');
 }

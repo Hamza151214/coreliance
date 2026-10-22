@@ -6,8 +6,8 @@ import { getCareerCases } from '../services/careerCaseService';
 import { styles } from '../styles/styles';
 
 export default function ExploreScreen({ navigation }) {
-  // Jeg henter career cases gennem careerCaseService i stedet for at importere
-  // demo-filen direkte. Så virker skærmen også, når data senere kommer fra Supabase.
+  // Jeg henter career cases fra Firebase gennem careerCaseService,
+  // så skærmen ikke selv kender til databasen.
   const [careerCases, setCareerCases] = useState([]);
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -90,8 +90,8 @@ export default function ExploreScreen({ navigation }) {
 
             <Text style={styles.noteText}>
               {loadFailed
-                ? 'Career cases could not be loaded. Please try again later.'
-                : 'The career cases below are demonstration examples.'}
+                ? 'Career cases could not be loaded. Please check your connection.'
+                : 'All career cases are fictional demonstration profiles made for this academic prototype.'}
             </Text>
           </>
         }

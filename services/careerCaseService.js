@@ -1,37 +1,44 @@
-import { DEMO_CAREER_CASES } from '../data/careerCases';
+import { ref, get } from 'firebase/database';
+
+import { db } from '../database/firebase';
 
 // Denne fil er det eneste sted i appen, der ved hvor career cases kommer fra.
-// Skærmene kalder kun getCareerCases() og er ligeglade med,
-// om data kommer fra demo-filen eller senere fra Supabase.
+// Casene ligger i Firebase Realtime Database under careerCases/<id>.
+// Lige nu er alle cases fiktive demo-profiler (se seed/careerCases.json).
 
 // Jeg omdanner alle cases til den samme model, så skærmene kan stole på,
 // at lister altid er arrays og at manglende felter ikke får appen til at crashe.
-function normalizeCareerCase(raw, isDemo) {
+function normalizeCareerCase(id, raw) {
   return {
-    id: String(raw.id),
-    isDemo: isDemo,
+    id: id,
+    // Alt der ikke udtrykkeligt er markeret som rigtigt, behandles som fiktivt.
+    isFictional: raw.fictional !== false,
     jobTitle: raw.jobTitle || '',
+    employerType: raw.employerType || '',
     field: raw.field || '',
     location: raw.location || '',
     outcome: raw.outcome || 'HIRED',
     university: raw.university || '',
     degree: raw.degree || '',
-    nationality: raw.nationality || '',
     danishLevel: raw.danishLevel || '',
     previousExperience: Array.isArray(raw.previousExperience) ? raw.previousExperience : [],
     skills: Array.isArray(raw.skills) ? raw.skills : [],
     applications: raw.applications ?? null,
     interviews: raw.interviews ?? null,
     offers: raw.offers ?? null,
+    monthsSearching: raw.monthsSearching ?? null,
     jobRoute: raw.jobRoute || '',
     referral: raw.referral ?? null,
+    challenges: raw.challenges || '',
+    strategy: raw.strategy || '',
+    story: raw.story || '',
     advice: raw.advice || '',
   };
 }
 
-// Lige nu returnerer jeg demo-cases. Funktionen er allerede async,
-// så den senere kan hente godkendte, anonymiserede cases fra Supabase
-// uden at skærmene skal ændres (se INTEGRATION_HANDOFF.md).
 export async function getCareerCases() {
-  return DEMO_CAREER_CASES.map((careerCase) => normalizeCareerCase(careerCase, true));
+  const snapshot = await get(ref(db, 'careerCases'));
+  const casesById = snapshot.val() || {};
+
+  return Object.entries(casesById).map(([id, careerCase]) => normalizeCareerCase(id, careerCase));
 }

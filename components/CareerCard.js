@@ -30,8 +30,10 @@ export default function CareerCard({ careerCase, onPress, children }) {
         {joinParts([careerCase.university, careerCase.degree])}
       </Text>
 
-      {/* Nationalitet og dansk-niveau */}
-      <Text style={styles.cardMeta}>{joinParts([careerCase.nationality, danish])}</Text>
+      {/* Type arbejdsgiver, by og dansk-niveau */}
+      <Text style={styles.cardMeta}>
+        {joinParts([careerCase.employerType, careerCase.location, danish])}
+      </Text>
 
       {/* Nøgletal om jobsøgningen vises kun, hvis de findes */}
       {careerCase.applications !== null && careerCase.interviews !== null ? (
@@ -46,6 +48,10 @@ export default function CareerCard({ careerCase, onPress, children }) {
       ) : null}
 
       {children}
+
+      {careerCase.isFictional ? (
+        <Text style={styles.fictionalTag}>Fictional demonstration profile</Text>
+      ) : null}
 
       {/* Tydelig "View case"-tekst der signalerer at kortet er klikbart */}
       <Text style={styles.viewCase}>View case →</Text>

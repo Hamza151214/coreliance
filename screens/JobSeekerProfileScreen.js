@@ -16,7 +16,7 @@ import { styles } from '../styles/styles';
 
 // Her opretter eller redigerer jobsøgeren sin profil.
 // Felterne kommer fra data/jobSeekerProfile.js, og gem/hent sker
-// gennem profileService, så skærmen ikke kender til AsyncStorage.
+// gennem profileService, så skærmen ikke selv kender til Firebase.
 export default function JobSeekerProfileScreen({ navigation }) {
   const scrollViewRef = useRef(null);
 
@@ -79,7 +79,7 @@ export default function JobSeekerProfileScreen({ navigation }) {
     try {
       await saveProfile(form);
       setHasSavedProfile(true);
-      setMessage({ type: 'success', text: 'Your profile has been saved on this device.' });
+      setMessage({ type: 'success', text: 'Your profile has been saved.' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Your profile could not be saved. Please try again.' });
     } finally {
@@ -133,12 +133,13 @@ export default function JobSeekerProfileScreen({ navigation }) {
         <Text style={styles.formIntro}>
           {hasSavedProfile
             ? 'Update your profile to get new matches.'
-            : 'Tell us who you are and what you are looking for. We use your answers to find people with a similar journey into the Danish job market.'}
+            : 'A few short questions about who you are and what you are looking for. It takes about 3 minutes.'}
         </Text>
 
         <Text style={styles.noteText}>
-          Your profile is only stored on this device. It is not sent to Coreliance
-          or any other service. Fields marked * are required.
+          Your profile is saved in your Coreliance account, and only you can see it.
+          It is only sent to the AI if you agree on the People Like Me screen.
+          Fields marked * are required.
         </Text>
 
         {PROFILE_SECTIONS.map((section) => (

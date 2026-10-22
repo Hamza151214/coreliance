@@ -50,15 +50,23 @@ export default function CareerCaseScreen({ route }) {
         <Text style={styles.detailTitle}>{careerCase.jobTitle}</Text>
 
         <Text style={styles.detailSubtitle}>
-          {[careerCase.location, careerCase.field].filter(Boolean).join(' · ')}
+          {[careerCase.employerType, careerCase.location, careerCase.field].filter(Boolean).join(' · ')}
         </Text>
+
+        {careerCase.isFictional ? (
+          <Text style={styles.fictionalTag}>
+            Fictional demonstration profile, not a real person.
+          </Text>
+        ) : null}
       </View>
 
       {/* Forklaring på matchet – kun når casen er åbnet fra People Like Me */}
       {match ? (
         <View style={styles.section}>
+          <Text style={styles.matchLabel}>AI-powered matching · {match.relevance}</Text>
           <Text style={styles.sectionTitle}>Why this case was suggested</Text>
 
+          {match.summary ? <Text style={styles.formIntro}>{match.summary}</Text> : null}
           <BulletList items={match.similarities} />
 
           {match.differences.length > 0 ? (
@@ -82,9 +90,16 @@ export default function CareerCaseScreen({ route }) {
         <Text style={styles.sectionTitle}>Background</Text>
         <DetailRow label="University" value={careerCase.university} />
         <DetailRow label="Degree" value={careerCase.degree} />
-        <DetailRow label="Nationality" value={careerCase.nationality} />
         <DetailRow label="Danish level" value={careerCase.danishLevel} />
       </View>
+
+      {/* Personens egen fortælling */}
+      {careerCase.story ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Their story</Text>
+          <Text style={styles.formIntro}>{careerCase.story}</Text>
+        </View>
+      ) : null}
 
       {/* Tidligere erfaring før jobbet */}
       <View style={styles.section}>
@@ -105,6 +120,21 @@ export default function CareerCaseScreen({ route }) {
         <DetailRow label="Applications" value={careerCase.applications} />
         <DetailRow label="Interviews" value={careerCase.interviews} />
         <DetailRow label="Offers" value={careerCase.offers} />
+        <DetailRow label="Months searching" value={careerCase.monthsSearching} />
+
+        {careerCase.challenges ? (
+          <>
+            <Text style={styles.subsectionTitle}>Biggest challenges</Text>
+            <Text style={styles.formIntro}>{careerCase.challenges}</Text>
+          </>
+        ) : null}
+
+        {careerCase.strategy ? (
+          <>
+            <Text style={styles.subsectionTitle}>What worked</Text>
+            <Text style={styles.formIntro}>{careerCase.strategy}</Text>
+          </>
+        ) : null}
       </View>
 
       {/* Resultatet af jobsøgningen */}
@@ -135,12 +165,6 @@ export default function CareerCaseScreen({ route }) {
         <Pressable style={styles.primaryButton} onPress={showCV}>
           <Text style={styles.primaryButtonText}>View CV</Text>
         </Pressable>
-
-        {careerCase.isDemo ? (
-          <Text style={styles.demoNote}>
-            This is a demonstration case, not a real Coreliance record.
-          </Text>
-        ) : null}
       </View>
     </ScrollView>
   );

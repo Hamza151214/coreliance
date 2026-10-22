@@ -1,28 +1,42 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ref, get, update } from 'firebase/database';
 
-// Denne fil står for at gemme og hente jobsøgerens profil.
-// Lige nu gemmes profilen kun lokalt på telefonen med AsyncStorage.
-// Skærmene bruger kun loadProfile() og saveProfile(), så AsyncStorage
-// senere kan erstattes af et kald til Supabase uden at ændre skærmene.
-const PROFILE_KEY = 'coreliance:jobSeekerProfile';
+import { auth, db } from '../database/firebase';
+import { EMPTY_PROFILE } from '../data/jobSeekerProfile';
 
-// Returnerer den gemte profil eller null, hvis brugeren ikke har lavet en endnu.
-// Hvis lageret fejler, kaster funktionen en fejl, som skærmen selv håndterer.
-export async function loadProfile() {
-  const json = await AsyncStorage.getItem(PROFILE_KEY);
+// Denne fil står for at gemme og hente jobsøgerens profil i Firebase Realtime Database.
+// Profilen ligger under jobSeekerProfiles/<UID>, og database-reglerne sikrer,
+// at en bruger kun kan læse og ændre sin egen profil.
+function profileRef() {
+  const user = auth.currentUser;
 
-  return json ? JSON.parse(json) : null;
+  if (!user) {
+    throw new Error('You need to be logged in.');
+  }
+
+  return ref(db, `jobSeekerProfiles/${user.uid}`);
 }
 
-// Jeg gemmer et tidsstempel sammen med profilen,
-// så brugeren kan se hvornår den sidst blev opdateret.
-export async function saveProfile(profile) {
-  const savedProfile = {
-    ...profile,
-    updatedAt: new Date().toISOString(),
-  };
+// Returnerer den gemte profil eller null, hvis brugeren ikke har lavet en endnu.
+// Firebase gemmer ikke tomme arrays, så jeg fletter med EMPTY_PROFILE.
+export async function loadProfile() {
+  const snapshot = await get(profileRef());
 
-  await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(savedProfile));
+  return snapshot.exists() ? { ...EMPTY_PROFILE, ...snapshot.val() } : null;
+}
+
+// Jeg bruger update i stedet for set, så et tidligere givet AI-samtykke ikke slettes,
+// når brugeren redigerer sin profil.
+export async function saveProfile(profile) {
+  const fields = Object.fromEntries(Object.keys(EMPTY_PROFILE).map((key) => [key, profile[key]]));
+  const savedProfile = { ...fields, updatedAt: new Date().toISOString() };
+
+  await update(profileRef(), savedProfile);
 
   return savedProfile;
+}
+
+// Gemmer tidspunktet for brugerens samtykke til, at profilen sendes til OpenAI.
+// Backend tjekker selv dette felt, før den kalder OpenAI.
+export async function giveAiConsent() {
+  await update(profileRef(), { aiConsentAt: new Date().toISOString() });
 }

@@ -1,9 +1,17 @@
-import { ScrollView, View, Text } from 'react-native';
+import { ScrollView, View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { signOut } from 'firebase/auth';
+
+import { auth } from '../database/firebase';
 
 import { styles, colors } from '../styles/styles';
 
 export default function AboutScreen() {
+  // Når brugeren logger ud, opdager App.js det og viser login-skærmen igen.
+  const handleLogout = () => {
+    signOut(auth);
+  };
+
   return (
     <ScrollView style={styles.screen}>
       <View style={styles.aboutContainer}>
@@ -32,11 +40,11 @@ export default function AboutScreen() {
 
           <View style={styles.aboutStepText}>
             <Text style={styles.aboutStepTitle}>
-              1. Explore real career cases
+              1. Explore career cases
             </Text>
 
             <Text style={styles.aboutStepDescription}>
-              See anonymised profiles showing education, experience,
+              See profiles showing education, experience,
               applications, interviews and job outcomes.
             </Text>
           </View>
@@ -102,6 +110,20 @@ export default function AboutScreen() {
           </View>
         </View>
 
+        {/* Konto og log ud */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Your account</Text>
+          <Text style={styles.formIntro}>Logged in as {auth.currentUser?.email}</Text>
+
+          <Pressable style={styles.secondaryButton} onPress={handleLogout}>
+            <Text style={styles.secondaryButtonText}>Log out</Text>
+          </Pressable>
+        </View>
+
+        <Text style={styles.noteText}>
+          Coreliance is an academic demonstration app (CBS INNT). All career cases
+          are fictional, and AI matching is for illustration only.
+        </Text>
       </View>
     </ScrollView>
   );
