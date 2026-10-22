@@ -1,11 +1,11 @@
-import { View, Text } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { styles, colors } from '../styles/styles';
 
 export default function AboutScreen() {
   return (
-    <View style={styles.screen}>
+    <ScrollView style={styles.screen}>
       <View style={styles.aboutContainer}>
 
         {/* 
@@ -72,7 +72,27 @@ export default function AboutScreen() {
 
           <View style={styles.aboutStepText}>
             <Text style={styles.aboutStepTitle}>
-              3. Contribute your experience
+              3. Find people like you
+            </Text>
+
+            <Text style={styles.aboutStepDescription}>
+              Create a job seeker profile and see career cases from people
+              with a similar background, goals and challenges.
+            </Text>
+          </View>
+        </View>
+
+        {/* Fjerde del af brugerrejsen */}
+        <View style={styles.aboutStep}>
+          <Ionicons
+            name="add-circle-outline"
+            size={26}
+            color={colors.accent}
+          />
+
+          <View style={styles.aboutStepText}>
+            <Text style={styles.aboutStepTitle}>
+              4. Contribute your experience
             </Text>
 
             <Text style={styles.aboutStepDescription}>
@@ -83,6 +103,6 @@ export default function AboutScreen() {
         </View>
 
       </View>
-    </View>
+    </ScrollView>
   );
 }

@@ -1,7 +1,9 @@
-// Anonymiserede career cases der bruges som eksempeldata i prototypen
-// Hvert objekt indeholder både det der vises på Explore-kortet
-// og det der vises på detaljesiden
-export const CAREER_CASES = [
+// DEMO-DATA: Disse career cases er opdigtede eksempler til prototypen.
+// De er IKKE rigtige besvarelser fra Coreliance-platformen.
+//
+// Filen må kun importeres af services/careerCaseService.js,
+// så den nemt kan erstattes af anonymiserede cases fra Supabase.
+export const DEMO_CAREER_CASES = [
   {
     id: '1',
     jobTitle: 'Junior Financial Analyst',

@@ -1,42 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
 
 import CareerCard from '../components/CareerCard';
-import { CAREER_CASES } from '../data/careerCases';
+import { getCareerCases } from '../services/careerCaseService';
 import { styles } from '../styles/styles';
 
-// Jeg samler alle mine filtre i ét array.
-// Det gør det nemt at tilføje eller fjerne kategorier senere.
-const FILTERS = [
-  'All',
-  'Finance',
-  'Data',
-  'Consulting',
-  'Marketing',
-  'IT',
-  'Business Development',
-];
-
 export default function ExploreScreen({ navigation }) {
+  // Jeg henter career cases gennem careerCaseService i stedet for at importere
+  // demo-filen direkte. Så virker skærmen også, når data senere kommer fra Supabase.
+  const [careerCases, setCareerCases] = useState([]);
+  const [loadFailed, setLoadFailed] = useState(false);
+
   // Jeg bruger state til at huske hvilket filter brugeren har valgt.
   // Appen starter med "All", så alle career cases bliver vist.
   const [selectedFilter, setSelectedFilter] = useState('All');
+
+  useEffect(() => {
+    getCareerCases()
+      .then(setCareerCases)
+      .catch(() => setLoadFailed(true));
+  }, []);
+
+  // Filtrene bygges ud fra de felter, der findes i data,
+  // så jeg ikke skal vedligeholde en separat liste.
+  const filters = ['All', ...new Set(careerCases.map((careerCase) => careerCase.field).filter(Boolean))];
 
   // Hvis brugeren vælger "All", bruger jeg hele datasættet.
   // Ellers filtrerer jeg efter careerCase.field.
   const filteredCases =
     selectedFilter === 'All'
-      ? CAREER_CASES
-      : CAREER_CASES.filter(
-          (careerCase) => careerCase.field === selectedFilter
-        );
+      ? careerCases
+      : careerCases.filter((careerCase) => careerCase.field === selectedFilter);
 
   // Når jeg trykker på et CareerCard, sender jeg hele den valgte case
   // videre til detaljesiden gennem navigation.
   const openCareerCase = (careerCase) => {
-    navigation.navigate('CareerCase', {
-      careerCase: careerCase,
-    });
+    navigation.navigate('CareerCase', { careerCase: careerCase });
   };
 
   // Denne funktion bestemmer hvordan én filterknap bliver vist.
@@ -47,19 +46,10 @@ export default function ExploreScreen({ navigation }) {
 
     return (
       <Pressable
-        style={[
-          styles.filterButton,
-          isActive && styles.filterButtonActive,
-        ]}
+        style={[styles.filterButton, isActive && styles.filterButtonActive]}
         onPress={() => setSelectedFilter(item)}
       >
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.filterText,
-            isActive && styles.filterTextActive,
-          ]}
-        >
+        <Text numberOfLines={1} style={[styles.filterText, isActive && styles.filterTextActive]}>
           {item}
         </Text>
       </Pressable>
@@ -68,12 +58,9 @@ export default function ExploreScreen({ navigation }) {
 
   return (
     <View style={styles.screen}>
-      {/* 
-        Jeg bruger en separat horizontal FlatList til filtrene.
-        style på selve listen bestemmer den faste højde.
-      */}
+      {/* Jeg bruger en separat horizontal FlatList til filtrene. */}
       <FlatList
-        data={FILTERS}
+        data={filters}
         horizontal
         keyExtractor={(item) => item}
         renderItem={renderFilter}
@@ -84,18 +71,32 @@ export default function ExploreScreen({ navigation }) {
 
       {/*
         Dette er appens hovedliste.
-        FlatList viser alle de career cases, der matcher det valgte filter.
+        Øverst ligger indgangen til People Like Me.
       */}
       <FlatList
         data={filteredCases}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={
+          <>
+            <Pressable style={styles.ctaCard} onPress={() => navigation.navigate('PeopleLikeMe')}>
+              <Text style={styles.ctaTitle}>People Like Me →</Text>
+              <Text style={styles.ctaText}>
+                Create your job seeker profile and see career cases from people with a
+                similar background and goals.
+              </Text>
+            </Pressable>
+
+            <Text style={styles.noteText}>
+              {loadFailed
+                ? 'Career cases could not be loaded. Please try again later.'
+                : 'The career cases below are demonstration examples.'}
+            </Text>
+          </>
+        }
         renderItem={({ item }) => (
-          <CareerCard
-            careerCase={item}
-            onPress={() => openCareerCase(item)}
-          />
+          <CareerCard careerCase={item} onPress={() => openCareerCase(item)} />
         )}
       />
     </View>

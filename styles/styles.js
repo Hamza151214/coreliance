@@ -14,6 +14,8 @@ export const colors = {
   accent: '#2F6FED',
   successBg: '#E4F4EC',
   successText: '#1F8B5A',
+  errorBg: '#FDECEC',
+  errorText: '#C0392B',
 };
 
 // Alle styles er samlet i én StyleSheet
@@ -25,53 +27,53 @@ export const styles = StyleSheet.create({
   },
 
   // ABOUT SCREEN
-// Denne sektion bruges til den korte introduktion til Coreliance.
-// Jeg holder designet simpelt og bruger de samme farver som resten af appen.
-aboutContainer: {
-  padding: 20,
-},
+  // Denne sektion bruges til den korte introduktion til Coreliance.
+  // Jeg holder designet simpelt og bruger de samme farver som resten af appen.
+  aboutContainer: {
+    padding: 20,
+  },
 
-aboutTitle: {
-  fontSize: 24,
-  fontWeight: '700',
-  color: colors.textPrimary,
-  marginBottom: 10,
-},
+  aboutTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: 10,
+  },
 
-aboutIntro: {
-  fontSize: 15,
-  color: colors.textSecondary,
-  lineHeight: 22,
-  marginBottom: 28,
-},
+  aboutIntro: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    lineHeight: 22,
+    marginBottom: 28,
+  },
 
-// Hvert step består af et ikon og en tekstblok ved siden af hinanden.
-aboutStep: {
-  flexDirection: 'row',
-  backgroundColor: colors.white,
-  padding: 16,
-  borderRadius: 12,
-  marginBottom: 12,
-  alignItems: 'flex-start',
-},
+  // Hvert step består af et ikon og en tekstblok ved siden af hinanden.
+  aboutStep: {
+    flexDirection: 'row',
+    backgroundColor: colors.white,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
 
-aboutStepText: {
-  flex: 1,
-  marginLeft: 14,
-},
+  aboutStepText: {
+    flex: 1,
+    marginLeft: 14,
+  },
 
-aboutStepTitle: {
-  fontSize: 15,
-  fontWeight: '600',
-  color: colors.textPrimary,
-  marginBottom: 5,
-},
+  aboutStepTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: 5,
+  },
 
-aboutStepDescription: {
-  fontSize: 13,
-  color: colors.textSecondary,
-  lineHeight: 19,
-},
+  aboutStepDescription: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 19,
+  },
 
   // FILTERLISTE PÅ EXPLORE-SCREEN
   // Jeg giver hele filterområdet en fast højde.
@@ -267,17 +269,34 @@ aboutStepDescription: {
     lineHeight: 22,
   },
 
-  // CV SNAPSHOT-KNAP (CareerCaseScreen)
-  cvButton: {
+  // KNAPPER
+  // Én fælles primær knap bruges til CV, Submit, Save og People Like Me,
+  // i stedet for flere næsten ens styles.
+  primaryButton: {
     backgroundColor: colors.navy,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  primaryButtonText: {
+    color: colors.white,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.navy,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 12,
   },
-  cvButtonText: {
-    color: colors.white,
+  secondaryButtonText: {
+    color: colors.navy,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -320,18 +339,129 @@ aboutStepDescription: {
     minHeight: 90,
     textAlignVertical: 'top',
   },
-  submitButton: {
-    backgroundColor: colors.navy,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 40,
+  inputHint: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginBottom: 6,
   },
-  submitButtonText: {
+  inputError: {
+    borderColor: colors.errorText,
+  },
+  errorText: {
+    fontSize: 12,
+    color: colors.errorText,
+    marginTop: 4,
+  },
+
+  // Valgknapper (fx dansk-niveau). De genbruger filterknappernes udseende
+  // fra Explore, men må gerne bryde over flere linjer.
+  choiceRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  choiceButton: {
+    marginBottom: 8,
+  },
+
+  // Sektionsoverskrift inde i en formular
+  formSectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.textMuted,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginTop: 28,
+  },
+
+  // Beskeder til brugeren (fx "Profile saved" eller valideringsfejl)
+  messageBox: {
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+  },
+  messageSuccess: {
+    backgroundColor: colors.successBg,
+  },
+  messageError: {
+    backgroundColor: colors.errorBg,
+  },
+  messageText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.textPrimary,
+  },
+
+  // PEOPLE LIKE ME
+  // Kortet øverst på Explore, som leder brugeren videre til People Like Me.
+  ctaCard: {
+    backgroundColor: colors.navy,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  ctaTitle: {
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.white,
-    fontSize: 15,
-    fontWeight: '600',
+    marginBottom: 4,
+  },
+  ctaText: {
+    fontSize: 13,
+    color: colors.white,
+    lineHeight: 19,
+    opacity: 0.85,
+  },
+
+  // Små grå noter, fx at data er demo og at profilen kun er gemt lokalt.
+  noteText: {
+    fontSize: 12,
+    color: colors.textMuted,
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+
+  demoNote: {
+    fontSize: 12,
+    color: colors.textMuted,
+    marginTop: 16,
+  },
+  sectionDescription: {
+    marginTop: 4,
+    marginBottom: 0,
+  },
+  headerButton: {
+    marginTop: 0,
+    marginBottom: 16,
+  },
+
+  // Forklaringen på et match, som vises inde i CareerCard
+  matchBox: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  matchLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.accent,
+    marginBottom: 4,
+  },
+  matchReason: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    lineHeight: 19,
+  },
+
+  centeredState: {
+    padding: 24,
+    alignItems: 'stretch',
+  },
+  stateTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginBottom: 8,
   },
 
   // KeyboardAvoidingView skal fylde hele skærmen.

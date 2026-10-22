@@ -1,12 +1,20 @@
 import { View, Text, Pressable } from 'react-native';
 import { styles } from '../styles/styles';
 
-// CareerCard viser én career case som et kort på Explore-screenen
+// Samler de felter, der findes, med " · " og springer tomme felter over.
+function joinParts(parts) {
+  return parts.filter(Boolean).join(' · ');
+}
+
+// CareerCard viser én career case som et kort.
 // Komponenten modtager:
 // - careerCase: objektet med al data om den pågældende case
 // - onPress: funktionen der kaldes når man trykker på kortet (åbner detaljesiden)
+// - children: valgfrit ekstra indhold, fx forklaringen på et match i People Like Me
 // Vi bruger Pressable, så hele kortet fungerer som en knap
-export default function CareerCard({ careerCase, onPress }) {
+export default function CareerCard({ careerCase, onPress, children }) {
+  const danish = careerCase.danishLevel ? `Danish ${careerCase.danishLevel}` : '';
+
   return (
     <Pressable style={styles.card} onPress={onPress}>
       {/* Øverste række: jobtitel og et badge der viser outcome (fx HIRED) */}
@@ -19,23 +27,25 @@ export default function CareerCard({ careerCase, onPress }) {
 
       {/* Universitet og uddannelse */}
       <Text style={styles.cardSubtitle}>
-        {careerCase.university} · {careerCase.degree}
+        {joinParts([careerCase.university, careerCase.degree])}
       </Text>
 
       {/* Nationalitet og dansk-niveau */}
-      <Text style={styles.cardMeta}>
-        {careerCase.nationality} · Danish {careerCase.danishLevel}
-      </Text>
+      <Text style={styles.cardMeta}>{joinParts([careerCase.nationality, danish])}</Text>
 
-      {/* Nøgletal om jobsøgningen — kravet om at vise applications/interviews */}
-      <View style={styles.cardStatsRow}>
-        <Text style={styles.cardStat}>
-          <Text style={styles.cardStatValue}>{careerCase.applications}</Text> applications
-        </Text>
-        <Text style={styles.cardStat}>
-          <Text style={styles.cardStatValue}>{careerCase.interviews}</Text> interviews
-        </Text>
-      </View>
+      {/* Nøgletal om jobsøgningen vises kun, hvis de findes */}
+      {careerCase.applications !== null && careerCase.interviews !== null ? (
+        <View style={styles.cardStatsRow}>
+          <Text style={styles.cardStat}>
+            <Text style={styles.cardStatValue}>{careerCase.applications}</Text> applications
+          </Text>
+          <Text style={styles.cardStat}>
+            <Text style={styles.cardStatValue}>{careerCase.interviews}</Text> interviews
+          </Text>
+        </View>
+      ) : null}
+
+      {children}
 
       {/* Tydelig "View case"-tekst der signalerer at kortet er klikbart */}
       <Text style={styles.viewCase}>View case →</Text>
