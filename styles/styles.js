@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-// Farvepalette til hele appen
-// Vi eksporterer den separat, så vi kan bruge farver direkte i komponenter
-// hvor vi ikke går gennem et style-objekt (fx dynamiske badges)
+// Farvepalette til hele appen.
+// Jeg eksporterer den separat, så farverne også kan bruges dér, hvor man ikke
+// kan give et style-objekt, fx ikonfarver og navigationens tint-farver.
 export const colors = {
   navy: '#0F1E3D',
   white: '#FFFFFF',
@@ -16,6 +16,8 @@ export const colors = {
   successText: '#1F8B5A',
   errorBg: '#FDECEC',
   errorText: '#C0392B',
+  infoBg: '#EAF1FE',
+  shadow: '#000000',
 };
 
 // Alle styles er samlet i én StyleSheet
@@ -24,6 +26,26 @@ export const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.lightGray,
+  },
+
+  // NAVIGATION (AppNavigator)
+  // Header og tab-bar styles ligger her, så navigationen ikke har sin egen styling.
+  header: {
+    backgroundColor: colors.navy,
+  },
+  headerTitle: {
+    fontWeight: '600',
+  },
+  headerIconButton: {
+    paddingHorizontal: 16,
+  },
+  tabBar: {
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    height: 60,
+    paddingBottom: 8,
+    paddingTop: 6,
   },
 
   // ABOUT SCREEN
@@ -129,9 +151,12 @@ export const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  // LISTE (ExploreScreen)
+  // LISTER (Explore og People Like Me)
   listContent: {
     padding: 16,
+  },
+  listHeader: {
+    marginBottom: 16,
   },
 
   // CAREER CARD
@@ -141,7 +166,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     // Skygge for at give kortet dybde
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 3,
@@ -270,7 +295,7 @@ export const styles = StyleSheet.create({
   },
 
   // KNAPPER
-  // Én fælles primær knap bruges til CV, Submit, Save og People Like Me,
+  // Én fælles primær og én sekundær knap bruges i hele appen,
   // i stedet for flere næsten ens styles.
   primaryButton: {
     backgroundColor: colors.navy,
@@ -301,9 +326,7 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  // FORMULAR (ContributeScreen)
-
-  // FORMULAR-CONTAINER
+  // FORMULARER (My Profile og Contribute)
   // Jeg giver formularen almindelig padding rundt om indholdet.
   // Der er også lidt ekstra plads nederst, så det sidste felt
   // stadig kan scrolles op over tastaturet.
@@ -385,31 +408,35 @@ export const styles = StyleSheet.create({
   messageError: {
     backgroundColor: colors.errorBg,
   },
+  messageInfo: {
+    backgroundColor: colors.infoBg,
+  },
   messageText: {
     fontSize: 14,
     lineHeight: 20,
     color: colors.textPrimary,
   },
 
-  // PEOPLE LIKE ME
-  // Kortet øverst på Explore, som leder brugeren videre til People Like Me.
-  ctaCard: {
-    backgroundColor: colors.navy,
+  // MY PROFILE (visning af den gemte profil)
+  profileSection: {
+    backgroundColor: colors.white,
     borderRadius: 12,
     padding: 16,
+    marginTop: 12,
+  },
+  profileItem: {
     marginBottom: 12,
   },
-  ctaTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-    marginBottom: 4,
-  },
-  ctaText: {
+  profileLabel: {
     fontSize: 13,
-    color: colors.white,
-    lineHeight: 19,
-    opacity: 0.85,
+    color: colors.textSecondary,
+    marginBottom: 2,
+  },
+  profileValue: {
+    fontSize: 14,
+    color: colors.textPrimary,
+    fontWeight: '500',
+    lineHeight: 20,
   },
 
   // Små grå noter, fx at data er demo og at profilen kun er gemt lokalt.
@@ -427,20 +454,8 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 8,
   },
-  centeredText: {
-    textAlign: 'center',
-    marginTop: 16,
-  },
 
-  sectionDescription: {
-    marginTop: 4,
-    marginBottom: 0,
-  },
-  headerButton: {
-    marginTop: 0,
-    marginBottom: 16,
-  },
-
+  // PEOPLE LIKE ME
   // Forklaringen på et match, som vises inde i CareerCard
   matchBox: {
     marginTop: 10,
@@ -460,6 +475,7 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
   },
 
+  // Tilstande som "ingen profil" og fejl, der fylder hele skærmen
   centeredState: {
     padding: 24,
     alignItems: 'stretch',
@@ -477,5 +493,4 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.lightGray,
   },
-
 });

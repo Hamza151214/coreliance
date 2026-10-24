@@ -8,18 +8,18 @@ export default function AboutScreen() {
     <ScrollView style={styles.screen}>
       <View style={styles.aboutContainer}>
 
-        {/* 
+        {/*
           Jeg bruger denne screen til kort at forklare idéen bag Coreliance.
-          Det gør det nemmere for en ny bruger at forstå værdien af appen,
-          uden at der skal bygges mere avanceret funktionalitet.
+          Den åbnes fra info-ikonet i headeren og er derfor ikke en tab.
         */}
         <Text style={styles.aboutTitle}>
           How Coreliance works
         </Text>
 
         <Text style={styles.aboutIntro}>
-          Coreliance helps international students and graduates understand
-          how other internationals actually entered the Danish job market.
+          Coreliance helps international students and graduates learn how others
+          have entered the Danish job market. In this prototype, all career cases
+          are fictional demonstration profiles.
         </Text>
 
         {/* Første del af brugerrejsen */}
@@ -36,8 +36,8 @@ export default function AboutScreen() {
             </Text>
 
             <Text style={styles.aboutStepDescription}>
-              See profiles showing education, experience,
-              applications, interviews and job outcomes.
+              Browse 14 fictional career stories showing education, experience,
+              applications, interviews and how the job was found.
             </Text>
           </View>
         </View>
@@ -56,8 +56,8 @@ export default function AboutScreen() {
             </Text>
 
             <Text style={styles.aboutStepDescription}>
-              Understand what someone's profile looked like when they
-              applied and how they eventually got hired.
+              See what each person's background looked like, what was hard
+              and which strategies helped.
             </Text>
           </View>
         </View>
@@ -76,8 +76,8 @@ export default function AboutScreen() {
             </Text>
 
             <Text style={styles.aboutStepDescription}>
-              Create a job seeker profile and see career cases from people
-              with a similar background, goals and challenges.
+              Create a short profile in My Profile. With your consent, AI finds
+              the fictional career stories most relevant to you.
             </Text>
           </View>
         </View>
@@ -96,15 +96,15 @@ export default function AboutScreen() {
             </Text>
 
             <Text style={styles.aboutStepDescription}>
-              Share your own career journey anonymously and help the next
-              international student navigate the job market.
+              The Contribute tab shows how employed internationals could share
+              their story. In this prototype it is a demo, and nothing is saved or sent.
             </Text>
           </View>
         </View>
 
         <Text style={styles.noteText}>
-          Coreliance is an academic demonstration app (CBS INNT). All career cases
-          are fictional, and AI matching is for illustration only.
+          Coreliance is an academic demonstration app (CBS INNT). Your profile and
+          AI matches are stored only on this device.
         </Text>
       </View>
     </ScrollView>

@@ -69,31 +69,18 @@ export default function ExploreScreen({ navigation }) {
         contentContainerStyle={styles.filterListContent}
       />
 
-      {/*
-        Dette er appens hovedliste.
-        Øverst ligger indgangen til People Like Me.
-      */}
+      {/* Appens hovedliste med de career cases, der passer til det valgte filter. */}
       <FlatList
         data={filteredCases}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
-          <>
-            <Pressable style={styles.ctaCard} onPress={() => navigation.navigate('PeopleLikeMe')}>
-              <Text style={styles.ctaTitle}>People Like Me →</Text>
-              <Text style={styles.ctaText}>
-                Create your job seeker profile and see career cases from people with a
-                similar background and goals.
-              </Text>
-            </Pressable>
-
-            <Text style={styles.noteText}>
-              {loadFailed
-                ? 'Career cases could not be loaded.'
-                : 'All career cases are fictional demonstration profiles made for this academic prototype.'}
-            </Text>
-          </>
+          <Text style={styles.noteText}>
+            {loadFailed
+              ? 'Career cases could not be loaded.'
+              : 'All career cases are fictional demonstration profiles made for this academic prototype.'}
+          </Text>
         }
         renderItem={({ item }) => (
           <CareerCard careerCase={item} onPress={() => openCareerCase(item)} />

@@ -34,8 +34,7 @@ function normalizeCareerCase(id, raw) {
   };
 }
 
-// Funktionen er async, så skærmene ikke skal ændres, hvis casene
-// senere skal hentes fra en rigtig datakilde i stedet for en lokal fil.
+// Funktionen er async ligesom de andre services, så skærmene henter data på samme måde.
 export async function getCareerCases() {
   return Object.entries(CAREER_CASES).map(([id, careerCase]) => normalizeCareerCase(id, careerCase));
 }

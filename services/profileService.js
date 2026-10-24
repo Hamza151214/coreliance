@@ -8,7 +8,7 @@ import { EMPTY_PROFILE } from '../data/jobSeekerProfile';
 const PROFILE_KEY = 'coreliance:jobSeekerProfile';
 
 // Returnerer den gemte profil eller null, hvis brugeren ikke har lavet en endnu.
-// Jeg fletter med EMPTY_PROFILE, så nye felter altid findes, også i ældre profiler.
+// Jeg fletter med EMPTY_PROFILE, så alle felter altid findes.
 // Hvis lageret fejler, kaster funktionen en fejl, som skærmen selv håndterer.
 export async function loadProfile() {
   const json = await AsyncStorage.getItem(PROFILE_KEY);
@@ -16,10 +16,17 @@ export async function loadProfile() {
   return json ? { ...EMPTY_PROFILE, ...JSON.parse(json) } : null;
 }
 
-// Gemmer profilen sammen med et tidsstempel. Et tidligere AI-samtykke bevares,
-// når brugeren redigerer sin profil.
-export async function saveProfile(profile) {
-  const savedProfile = { ...profile, updatedAt: new Date().toISOString() };
+// Gemmer formularens felter. Jeg tager kun de felter med, der findes i formularen,
+// og henter et eventuelt AI-samtykke fra den gemte profil, så det ikke går tabt,
+// hvis formularen blev åbnet, før samtykket blev givet.
+export async function saveProfile(form) {
+  const existingProfile = await loadProfile();
+  const fields = Object.fromEntries(Object.keys(EMPTY_PROFILE).map((key) => [key, form[key]]));
+  const savedProfile = {
+    ...fields,
+    aiConsentAt: existingProfile?.aiConsentAt,
+    updatedAt: new Date().toISOString(),
+  };
 
   await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(savedProfile));
 
@@ -27,7 +34,6 @@ export async function saveProfile(profile) {
 }
 
 // Gemmer tidspunktet for brugerens samtykke til, at profilen sendes til OpenAI.
-// updatedAt ændres bevidst ikke, da selve profilen ikke er ændret.
 export async function giveAiConsent(profile) {
   const consentedProfile = { ...profile, aiConsentAt: new Date().toISOString() };
 

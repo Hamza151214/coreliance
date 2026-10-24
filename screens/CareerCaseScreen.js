@@ -32,13 +32,9 @@ export default function CareerCaseScreen({ route }) {
   // så jeg kan vise hvorfor casen blev foreslået.
   const { careerCase, match } = route.params;
 
-  // I prototypen har vi ikke rigtige CV-filer endnu.
-  // Knappen viser derfor en Alert for at demonstrere funktionaliteten.
+  // Prototypen har ingen CV-filer. Knappen viser derfor kun en forklaring.
   const showCV = () => {
-    Alert.alert(
-      'CV Snapshot',
-      'The anonymised CV will be available in a future version of Coreliance.'
-    );
+    Alert.alert('CV Snapshot', 'CV snapshots are not part of this prototype.');
   };
 
   const referral = careerCase.referral === null ? null : careerCase.referral ? 'Yes' : 'No';
@@ -154,12 +150,12 @@ export default function CareerCaseScreen({ route }) {
         </View>
       ) : null}
 
-      {/* Placeholder til den fremtidige CV-funktion */}
+      {/* CV-knappen er kun en placeholder i prototypen */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>CV Snapshot</Text>
 
         <Text style={styles.formIntro}>
-          See the anonymised CV that was used when applying for this role.
+          In a full version, you could see an anonymised CV used for this application.
         </Text>
 
         <Pressable style={styles.primaryButton} onPress={showCV}>

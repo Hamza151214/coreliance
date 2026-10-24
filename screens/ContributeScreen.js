@@ -80,9 +80,8 @@ export default function ContributeScreen() {
       return;
     }
 
-    // Prototypen har ingen backend til denne formular.
-    // Alerten demonstrerer, at formularen bliver behandlet.
-    Alert.alert('Thank you!', 'Your career case has been submitted.');
+    // Formularen er kun en demo. Beskeden siger derfor ærligt, at intet er sendt.
+    Alert.alert('Thank you!', 'This is a demo, so your answers were not saved or sent.');
 
     // Jeg nulstiller formularen og scroller tilbage til toppen.
     setForm(EMPTY_FORM);
@@ -106,8 +105,12 @@ export default function ContributeScreen() {
         keyboardDismissMode="interactive"
       >
         <Text style={styles.formIntro}>
-          Share your experience anonymously and help other international
-          students understand how people actually enter the Danish job market.
+          Already working in Denmark? This form shows how you could share your
+          experience to help other international students.
+        </Text>
+
+        <Text style={styles.noteText}>
+          Demo form: nothing you enter here is saved or sent anywhere.
         </Text>
 
         {CONTRIBUTE_FIELDS.map((field) => (

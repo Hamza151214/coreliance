@@ -8,7 +8,7 @@ cloud database, no user accounts and no hosting.
 |---|---|---|
 | Profile storage | `services/profileService.js` | `loadProfile()`, `saveProfile(profile)`, `giveAiConsent(profile)` |
 | Career cases | `services/careerCaseService.js` | `getCareerCases()` |
-| Matching (client) | `services/matchingService.js` | `findMatches(profile)` → `POST /match` |
+| Matching (client) | `services/matchingService.js` | `requestMatches(profile)` → `POST /match`, `loadCachedMatches()`, `getProfileSignature(profile)` |
 | Matching (server) | `server/index.js`, `server/matching.js` | `POST /match { profile }` → `{ model, matches }` |
 
 ## Job seeker profile
@@ -37,16 +37,22 @@ later, replace the body of `getCareerCases()` and make the server read the same 
 
 ## Matching
 
-1. `PeopleLikeMeScreen` loads the profile. With no profile it shows the form link; without consent
-   it shows the consent screen.
-2. `findMatches(profile)` posts the profile to `API_URL/match`. The default is localhost, or
+1. `PeopleLikeMeScreen` (its own tab) loads the profile and the cached matches from AsyncStorage
+   and never calls OpenAI by itself. With no profile it links to My Profile; without consent it
+   shows the consent screen.
+2. Only a button press ("Find my matches", "Update matches" or "Refresh matches") calls
+   `requestMatches(profile)`, which posts the profile to `API_URL/match`. The default is localhost, or
    `10.0.2.2` on the Android emulator; it can be overridden with `EXPO_PUBLIC_API_URL`.
 3. The server whitelists the profile fields and sends them, together with the cases, to OpenAI Chat
    Completions using a strict JSON schema. The model defaults to `gpt-5-mini` and is set with
    `OPENAI_MODEL`.
 4. The server drops matches with unknown or duplicate IDs or an invalid shape, and returns at most 5.
-5. The client joins the IDs to case objects. `CareerCaseScreen` shows the explanation when it
-   receives `match`.
+5. The client stores the result under `coreliance:matchCache`, together with `matchingVersion`,
+   `datasetVersion` (a hash of the cases), `profileSignature` (a hash of the 12 profile answers) and
+   `createdAt`. If the version or dataset differs, the cache is ignored. If the signature differs,
+   the matches are shown as out of date. A failed call leaves the cache untouched.
+6. The client joins the IDs to case objects. `CareerCaseScreen` (in the root stack, reachable from
+   Explore and People Like Me) shows the explanation when it receives `match`.
 
 Match format: `{ careerCaseId, careerCase, relevance, summary, similarities[], differences[], lessons[] }`.
 

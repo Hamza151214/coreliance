@@ -1,143 +1,112 @@
+import { Pressable } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
-import AboutScreen from '../screens/AboutScreen';
 import ExploreScreen from '../screens/ExploreScreen';
-import CareerCaseScreen from '../screens/CareerCaseScreen';
-import ContributeScreen from '../screens/ContributeScreen';
 import PeopleLikeMeScreen from '../screens/PeopleLikeMeScreen';
 import JobSeekerProfileScreen from '../screens/JobSeekerProfileScreen';
-import { colors } from '../styles/styles';
+import ContributeScreen from '../screens/ContributeScreen';
+import CareerCaseScreen from '../screens/CareerCaseScreen';
+import AboutScreen from '../screens/AboutScreen';
+import { styles, colors } from '../styles/styles';
 
-// Jeg bruger farverne fra styles.js, så navigationen passer til resten af appen.
-// Header-designet er det samme for både stakken og de tabs, der har egen header.
+// Navigationen består af to lag:
+// 1. En Stack Navigator yderst, som indeholder tabs, CareerCase og About.
+// 2. En Bottom Tab Navigator med appens fire hovedområder.
+// CareerCase ligger i stakken, så den samme detaljeside kan åbnes fra både
+// Explore og People Like Me, og tilbage-pilen altid fører til den rigtige tab.
+
+// Header-design, som både stakken og tabs bruger. Farver og tekst ligger i styles.js.
 const headerOptions = {
-  headerStyle: {
-    backgroundColor: colors.navy,
-  },
-
-  // Farven på titel og tilbage-pil.
+  headerStyle: styles.header,
   headerTintColor: colors.white,
-
-  headerTitleStyle: {
-    fontWeight: '600',
-  },
+  headerTitleStyle: styles.headerTitle,
 };
 
 // Ikon til hver tab. Den aktive tab får det fyldte ikon,
 // de andre får outline-versionen (fx "compass-outline").
 const TAB_ICONS = {
-  ExploreTab: 'compass',
-  AboutTab: 'information-circle',
-  ContributeTab: 'add-circle',
+  Explore: 'compass',
+  PeopleLikeMe: 'people',
+  MyProfile: 'person-circle',
+  Contribute: 'add-circle',
 };
 
-// Jeg opretter en Stack Navigator til Explore-delen.
-// Den indeholder Explore-listen, People Like Me, jobsøgerprofilen og detaljesiden,
-// så brugeren altid kan gå tilbage til den forrige skærm.
+const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function ExploreStack() {
-  return (
-    <Stack.Navigator screenOptions={headerOptions}>
-      {/* Startsiden i Explore-flowet med listen over alle career cases. */}
-      <Stack.Screen
-        name="Explore"
-        component={ExploreScreen}
-        options={{ title: 'Explore Careers' }}
-      />
-
-      {/* Matches baseret på jobsøgerens gemte profil. */}
-      <Stack.Screen
-        name="PeopleLikeMe"
-        component={PeopleLikeMeScreen}
-        options={{ title: 'People Like Me' }}
-      />
-
-      {/* Formularen hvor jobsøgeren opretter eller redigerer sin profil. */}
-      <Stack.Screen
-        name="JobSeekerProfile"
-        component={JobSeekerProfileScreen}
-        options={{ title: 'My Profile' }}
-      />
-
-      {/*
-        Detaljesiden bruges både fra Explore og fra People Like Me,
-        så der ikke findes to forskellige detaljesider.
-      */}
-      <Stack.Screen
-        name="CareerCase"
-        component={CareerCaseScreen}
-        options={{ title: 'Career Case' }}
-      />
-    </Stack.Navigator>
-  );
-}
-
-// Jeg opretter en Bottom Tab Navigator.
-// Den bruges til de tre hovedområder i appen:
-// Explore, About og Contribute.
-const Tab = createBottomTabNavigator();
-
-export default function AppNavigator() {
+function MainTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      screenOptions={({ route, navigation }) => ({
         ...headerOptions,
-
-        // Explore har allerede sin egen header gennem Stack Navigator.
-        // Derfor skjuler jeg tab-headeren på Explore.
-        headerShown: route.name !== 'ExploreTab',
-
-        // Den aktive tab bruger navy, mens de andre tabs bruger grå.
         tabBarActiveTintColor: colors.navy,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: styles.tabBar,
 
-        // Jeg skjuler bottom navigation, når tastaturet åbner.
-        // Det giver mere plads på formularerne.
+        // Jeg skjuler tab-baren, når tastaturet er åbent, så formularerne får mere plads.
         tabBarHideOnKeyboard: true,
-
-        tabBarStyle: {
-          backgroundColor: colors.white,
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
-        },
 
         tabBarIcon: ({ focused, color, size }) => {
           const iconName = focused ? TAB_ICONS[route.name] : `${TAB_ICONS[route.name]}-outline`;
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
+
+        // About er ikke en tab. Den åbnes fra info-ikonet i headeren,
+        // så vi undgår fem tabs i bunden.
+        headerRight: () => (
+          <Pressable
+            style={styles.headerIconButton}
+            onPress={() => navigation.navigate('About')}
+            accessibilityLabel="About Coreliance"
+          >
+            <Ionicons name="information-circle-outline" size={24} color={colors.white} />
+          </Pressable>
+        ),
       })}
     >
-      {/*
-        Første tab er Explore.
-        Den peger på ExploreStack og ikke direkte på ExploreScreen,
-        fordi Explore også skal kunne åbne de andre skærme i stakken.
-      */}
       <Tab.Screen
-        name="ExploreTab"
-        component={ExploreStack}
-        options={{ title: 'Explore' }}
+        name="Explore"
+        component={ExploreScreen}
+        options={{ title: 'Explore', headerTitle: 'Explore Careers' }}
       />
-
-      {/* Anden tab er About. Her forklarer jeg kort hvordan Coreliance fungerer. */}
       <Tab.Screen
-        name="AboutTab"
-        component={AboutScreen}
-        options={{ title: 'About', headerTitle: 'About Coreliance' }}
+        name="PeopleLikeMe"
+        component={PeopleLikeMeScreen}
+        options={{ title: 'People Like Me' }}
       />
-
-      {/* Tredje tab er Contribute. Her kan ansatte udfylde deres egen career case (demo). */}
       <Tab.Screen
-        name="ContributeTab"
+        name="MyProfile"
+        component={JobSeekerProfileScreen}
+        options={{ title: 'My Profile' }}
+      />
+      <Tab.Screen
+        name="Contribute"
         component={ContributeScreen}
         options={{ title: 'Contribute' }}
       />
     </Tab.Navigator>
+  );
+}
+
+export default function AppNavigator() {
+  return (
+    // "minimal" viser kun tilbage-pilen uden tekst ved siden af.
+    <Stack.Navigator screenOptions={{ ...headerOptions, headerBackButtonDisplayMode: 'minimal' }}>
+      {/* Tabs har deres egne headers, så stakkens header skjules her.
+          Titlen bruges af skærmlæsere på tilbage-knappen. */}
+      <Stack.Screen
+        name="Tabs"
+        component={MainTabs}
+        options={{ headerShown: false, title: 'Coreliance' }}
+      />
+
+      {/* Detaljesiden bruges både fra Explore og People Like Me. */}
+      <Stack.Screen name="CareerCase" component={CareerCaseScreen} options={{ title: 'Career Case' }} />
+
+      <Stack.Screen name="About" component={AboutScreen} options={{ title: 'About Coreliance' }} />
+    </Stack.Navigator>
   );
 }

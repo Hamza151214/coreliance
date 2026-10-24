@@ -29,7 +29,7 @@ npm run dev
 ```
 
 Kommandoen starter både den lokale AI-server (port 3001) og Expo. Tryk `w` for web, `i` for
-iOS-simulator, eller scan QR-koden med Expo Go.
+iOS-simulator, eller scan QR-koden med Expo Go. Stop begge med Ctrl+C.
 
 **Fysisk telefon:** telefonen kan ikke nå `localhost` på computeren. Start i stedet med computerens
 IP-adresse (vises i Expo som `exp://192.168.x.x:8081`):
@@ -42,39 +42,49 @@ Telefon og computer skal være på samme Wi-Fi. Serveren er kun tilgængelig på
 
 Server-tests med en falsk OpenAI (ingen nøgle nødvendig): `npm test`.
 
-## Funktioner
+## Navigation
 
-* **Explore**: de 14 fiktive career cases med filtre og detaljeside.
-* **My Profile**: kort jobsøgerprofil (12 spørgsmål i tre sektioner, primært valgknapper og to
-  fritekstfelter) med validering. Profilen kan redigeres senere.
-* **People Like Me**: efter samtykke sendes profilen til den lokale server, som spørger OpenAI og
-  returnerer de mest relevante cases med ligheder, forskelle og læringspointer.
-* **Career Case**: detaljesiden, som bruges fra både Explore og People Like Me.
-* **About**: kort forklaring af idéen.
-* **Contribute**: lokal demo-formular for ansatte. Intet gemmes eller sendes.
+Appen har fire tabs i bunden:
 
-## Data og AI
+* **Explore**: de 14 fiktive career cases med filtre.
+* **People Like Me**: personlige AI-matches baseret på din profil.
+* **My Profile**: opret, se og rediger din jobsøgerprofil (12 spørgsmål i tre sektioner).
+* **Contribute**: demo-formular for ansatte. Intet gemmes eller sendes.
 
-* **AsyncStorage** gemmer kun jobsøgerens profil og tidspunktet for AI-samtykke på enheden
-  (nøglen `coreliance:jobSeekerProfile`).
-* **Career cases** ligger i `data/careerCases.json`. Både appen og serveren læser den samme fil.
-* **OpenAI-matching**: serveren sender kun de relevante profilfelter og de fiktive cases til OpenAI,
-  beder om struktureret JSON og kontrollerer, at alle case-ID'er findes. Nationalitet og andre
-  beskyttede karakteristika bruges ikke. Hvis OpenAI fejler, vises fejlen. Der er ingen skjult
+**About** åbnes fra info-ikonet øverst til højre. **Career Case** er den samme detaljeside fra både
+Explore og People Like Me, og tilbage-pilen fører altid tilbage til den tab, man kom fra.
+
+## Data, AI og caching
+
+* **AsyncStorage** gemmer to ting på enheden:
+  * `coreliance:jobSeekerProfile`: profilen og tidspunktet for AI-samtykke.
+  * `coreliance:matchCache`: de seneste AI-matches (case-ID'er, forklaringer og tidspunkt), en
+    signatur af de profilsvar, der blev brugt, og versioner af matchinglogik og datasæt.
+* **OpenAI kaldes kun, når brugeren trykker** på "Find my matches", "Update matches" eller
+  "Refresh matches". At åbne People Like Me igen, navigere tilbage eller gemme profilen starter
+  aldrig et nyt kald. De gemte matches vises i stedet med det samme, også efter genstart.
+* Ændres de profilsvar, AI'en brugte, markeres matches som forældede med en "Update matches"-knap.
+  Gemmes profilen uden ændringer, beholdes matches.
+* Ændres career cases eller `MATCHING_VERSION` i `services/matchingService.js`, kasseres gamle matches.
+* Fejler et AI-kald, beholdes de tidligere matches, og fejlen vises tydeligt. Der er ingen skjult
   "nød-matching".
+* **Career cases** ligger i `data/careerCases.json`. Både appen og serveren læser den samme fil.
+* **Serveren** sender kun de relevante profilfelter og de fiktive cases til OpenAI, beder om
+  struktureret JSON og kontrollerer, at alle case-ID'er findes. Nationalitet og andre beskyttede
+  karakteristika bruges ikke. Serveren gemmer intet.
 
 ## Projektstruktur
 
 ```
 App.js                        Root med NavigationContainer
-navigation/AppNavigator.js    Bottom tabs + Explore-stak
+navigation/AppNavigator.js    Stack (tabs, Career Case, About) + fire bottom tabs
 screens/                      Explore, CareerCase, PeopleLikeMe, JobSeekerProfile, About, Contribute
 components/                   CareerCard, FormField
 data/careerCases.json         14 fiktive career cases
 data/jobSeekerProfile.js      Felter og validering for jobsøgerprofilen
 services/careerCaseService.js Henter career cases
 services/profileService.js    Gemmer/henter profil og samtykke med AsyncStorage
-services/matchingService.js   Kalder den lokale AI-server
+services/matchingService.js   Kalder den lokale AI-server og cacher matches
 server/index.js               Lokal Node.js-server (POST /match)
 server/matching.js            Prompt, OpenAI-kald og validering
 server/matching.test.js       Tests med falsk OpenAI
